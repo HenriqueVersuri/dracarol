@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Modal from './components/Modal';
 import ThoughtBubble from './components/ThoughtBubble';
 import type { NodeData } from './types';
@@ -13,6 +13,7 @@ const nodes: NodeData[] = [
     title: 'Zona de Foco',
     content: <p>Você me mostrou que o hiperfoco não era um problema, mas uma característica poderosa. Com sua ajuda, aprendi a canalizá-lo como um superpoder, transformando minha maneira de ver o mundo. Gratidão por me ajudar a entender como minha mente funciona.</p>,
     position: { top: '15%', left: '10%' },
+    mobilePosition: { top: '14%', left: '12%' },
     bgColor: 'bg-blue-500/50',
     icon: <FocusIcon />,
   },
@@ -21,6 +22,7 @@ const nodes: NodeData[] = [
     title: 'Tempestade de Ideias',
     content: <p>Minha mente era uma tempestade de ideias que eu não entendia. Você não tentou parar a chuva, mas me deu um mapa, me mostrando que eu podia navegar e até dançar nela. Gratidão por me ensinar a ver a beleza no meu caos criativo.</p>,
     position: { top: '20%', right: '12%' },
+    mobilePosition: { top: '14%', left: '62%' },
     bgColor: 'bg-purple-500/50',
     icon: <IdeaStormIcon />,
   },
@@ -29,6 +31,7 @@ const nodes: NodeData[] = [
     title: 'Mundo Sensorial',
     content: <p>As cores, sons e texturas do mundo me sobrecarregavam. Você me ajudou a entender que minha sensibilidade não é uma fraqueza, mas uma forma única de perceber a realidade. Gratidão por me mostrar como encontrar harmonia nos detalhes.</p>,
     position: { bottom: '20%', left: '15%' },
+    mobilePosition: { top: '32%', left: '12%' },
     bgColor: 'bg-teal-500/50',
     icon: <SensoryIcon />,
   },
@@ -37,6 +40,7 @@ const nodes: NodeData[] = [
     title: 'O Organizador',
     content: <p>Meus pensamentos pareciam um quebra-cabeça impossível. Ao me ajudar a entender o TDAH, você me entregou a 'caixa' com a imagem de referência, me dando a clareza para começar a montar minha própria ordem. Gratidão.</p>,
     position: { bottom: '15%', right: '18%' },
+    mobilePosition: { top: '32%', left: '62%' },
     bgColor: 'bg-amber-500/50',
     icon: <OrganizerIcon />,
   },
@@ -45,6 +49,7 @@ const nodes: NodeData[] = [
     title: 'Encontrando a Calma',
     content: <p>Entre o caos de pensamentos e sentimentos, você me mostrou como encontrar ilhas de calma. Aprendi a respirar e a entender que a tranquilidade também mora dentro de mim. Gratidão por me ensinar a ancorar.</p>,
     position: { top: '50%', left: '5%' },
+    mobilePosition: { top: '50%', left: '10%' },
     bgColor: 'bg-green-500/50',
     icon: <CalmIcon />,
   },
@@ -53,6 +58,7 @@ const nodes: NodeData[] = [
     title: 'Decifrando a Comunicação',
     content: <p>Eu achava que falava uma língua diferente. Você me mostrou que minha forma de comunicar não era errada, apenas única. Com sua orientação, aprendi a construir pontes, em vez de muros. Gratidão por validar minha voz.</p>,
     position: { top: '55%', right: '5%' },
+    mobilePosition: { top: '50%', left: '64%' },
     bgColor: 'bg-sky-500/50',
     icon: <CommunicationIcon />,
   },
@@ -61,6 +67,7 @@ const nodes: NodeData[] = [
     title: 'Jornada de Descoberta',
     content: <p>Antes do diagnóstico, eu me sentia perdido. Cada sessão foi como acender uma luz em um cômodo da minha mente. Não se trata de 'melhorar', mas de me conhecer. Gratidão por ser a guia nesta jornada de autodescoberta.</p>,
     position: { bottom: '5%', left: '45%' },
+    mobilePosition: { top: '68%', left: '12%' },
     bgColor: 'bg-orange-500/50',
     icon: <GrowthIcon />,
   },
@@ -69,6 +76,7 @@ const nodes: NodeData[] = [
     title: 'Gratidão Compartilhada',
     content: <p>Gratidão por compartilhar sua história e me motivar a construir a minha. Felicidades em sua profissão e no relacionamento.</p>,
     position: { top: '32%', left: '58%' },
+    mobilePosition: { top: '68%', left: '62%' },
     bgColor: 'bg-rose-500/50',
     icon: <GratitudeIcon />,
   },
@@ -77,7 +85,12 @@ const nodes: NodeData[] = [
 const mainMessageNode: NodeData = {
   id: 'main',
   title: 'Gratidão, Dra. Carol',
-  content: <p>Gratidão por me dar as ferramentas para navegar na bela e caótica sinfonia da minha mente. Com sua ajuda, estou aprendendo a ser o maestro.</p>,
+  content: (
+    <div className="space-y-4">
+      <p>Gratidão por me dar as ferramentas para navegar na bela e caótica sinfonia da minha mente. Com sua ajuda, estou aprendendo a ser o maestro.</p>
+      <p className="text-right text-pink-200 italic">— Henrique Versuri</p>
+    </div>
+  ),
   position: {},
   bgColor: 'bg-pink-500/50',
   icon: <HeartIcon />,
@@ -86,8 +99,22 @@ const mainMessageNode: NodeData = {
 const App: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const bubbleRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleNodeClick = (node: NodeData) => {
     setSelectedNode(node);
@@ -99,13 +126,27 @@ const App: React.FC = () => {
     setActiveNodeId(null);
   };
 
+  const getBubblePosition = (node: NodeData, index: number) => {
+    if (isMobile) {
+      if (node.mobilePosition) {
+        return node.mobilePosition;
+      }
+      const column = index % 2;
+      const row = Math.floor(index / 2);
+      return { top: `${18 + row * 18}%`, left: column === 0 ? '12%' : '62%' };
+    }
+    return node.position;
+  };
+
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 text-white flex items-center justify-center font-sans">
+    <main
+      className={`relative w-screen min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 text-white flex items-center justify-center font-sans ${isMobile ? 'px-6 pt-20 pb-32 overflow-visible' : 'overflow-hidden'}`}
+    >
       <OrientationLock />
       <StarryBackground />
-      <ConnectingLines mainRef={mainButtonRef} bubbleRefs={bubbleRefs} />
+      {!isMobile && <ConnectingLines mainRef={mainButtonRef} bubbleRefs={bubbleRefs} />}
 
-      <div className="relative z-10 text-center flex flex-col items-center">
+      <div className="relative z-10 text-center flex flex-col items-center gap-6">
         <h1 className="text-2xl md:text-4xl font-extralight tracking-wider mb-4 text-gray-300">
           Uma Viagem pela Minha Mente
         </h1>
@@ -114,14 +155,14 @@ const App: React.FC = () => {
           onClick={() => handleNodeClick(mainMessageNode)}
           className={`group relative flex flex-col items-center justify-center transform transition-transform duration-300 hover:scale-105 ${activeNodeId && activeNodeId !== 'main' ? 'animate-pulse-link' : ''}`}
         >
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-pink-500/30 flex items-center justify-center animate-pulse-main cursor-pointer shadow-2xl backdrop-blur-md">
-            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-pink-500/50 flex items-center justify-center">
+          <div className="w-28 h-28 md:w-40 md:h-40 rounded-full bg-pink-500/30 flex items-center justify-center animate-pulse-main cursor-pointer shadow-2xl backdrop-blur-md">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-pink-500/50 flex items-center justify-center">
               <HeartIcon />
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-1">
             <p className="text-lg md:text-xl font-semibold text-pink-300 tracking-wide">Gratidão, Dra. Carol</p>
-            <p className="text-base md:text-lg font-light text-gray-300 mt-1">- Henrique Versuri</p>
+            <p className="text-base md:text-lg font-light text-gray-300">Henrique Versuri</p>
           </div>
           <span className="text-xs md:text-sm text-gray-400 mt-2">(clique em mim)</span>
         </button>
@@ -135,6 +176,7 @@ const App: React.FC = () => {
           onClick={handleNodeClick}
           index={index}
           isActive={activeNodeId === node.id}
+          positionStyle={getBubblePosition(node, index)}
         />
       ))}
 

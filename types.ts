@@ -6,6 +6,7 @@ export interface NodeData {
   title: string;
   content: React.ReactNode;
   position: { top?: string; bottom?: string; left?: string; right?: string; };
+  mobilePosition?: { top?: string; bottom?: string; left?: string; right?: string; };
   bgColor: string;
   icon: React.ReactNode;
 }
