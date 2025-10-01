@@ -21,8 +21,8 @@ const ThoughtBubble: React.FC<ThoughtBubbleProps> = forwardRef<HTMLButtonElement
       }}
       aria-label={`Abrir informação sobre ${node.title}`}
     >
-      <div className={`w-16 h-16 md:w-24 md:h-24 rounded-full flex items-center justify-center cursor-pointer shadow-lg animate-pulse-slow ${node.bgColor}`}>
-        <div className="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-opacity-50 backdrop-blur-sm group-hover:bg-opacity-70 transition-all duration-300">
+      <div className={`w-14 h-14 md:w-24 md:h-24 rounded-full flex items-center justify-center cursor-pointer shadow-lg animate-pulse-slow ${node.bgColor}`}>
+        <div className="w-10 h-10 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-opacity-50 backdrop-blur-sm group-hover:bg-opacity-70 transition-all duration-300">
           {node.icon}
         </div>
       </div>
